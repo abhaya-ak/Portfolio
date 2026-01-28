@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Fullscreen Landing -->
+<div class="position-relative vh-100 d-flex justify-content-center align-items-center" style="background: #ffffff; overflow: hidden;">
+  
+  <!-- Particles canvas -->
+  <canvas id="particles-canvas" class="position-absolute top-0 start-0 w-100 h-100"></canvas>
+
+  <!-- Centered content -->
+  <div class="text-center position-relative">
+    <h1 id="typing-text" class="fw-bold display-4 mb-3" style="font-family: 'Poppins', sans-serif; color:#111; text-shadow: 0 0 5px rgba(0,0,0,0.2);"></h1>
+    <p class="lead opacity-75">Want to grow Your bussiness with technology</p>
+    <p class="lead opacity-75">Join with me !</p>
+    <div class="spinner-border text-dark mt-4 d-none" role="status" id="loader">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+  /* Typing cursor */
+  #typing-text::after {
+    content: '|';
+    animation: blink 0.7s infinite;
+    font-weight: bold;
+    color: #111;
+  }
+
+  @keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+  }
+
+  /* Fade-in */
+  .fade-in {
+    animation: fadeIn 1s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const text = "Welcome to Abhaya's site ";
+    const letters = text.split("");
+    let index = 0;
+    const typingElement = document.getElementById("typing-text");
+    const loader = document.getElementById("loader");
+
+    function typeLetter() {
+      if (index < letters.length) {
+        typingElement.textContent += letters[index];
+        index++;
+        setTimeout(typeLetter, 60 + Math.random()*40); // dynamic typing speed
+      } else {
+        loader.classList.remove("d-none");
+        loader.classList.add("fade-in");
+        setTimeout(() => {
+          window.location.href = "{% url 'home' %}";
+        }, 1200);
+      }
+    }
+    typeLetter();
+  });
+
+  /* ---------------- Particles Animation (Black) ---------------- */
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let particlesArray = [];
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  class Particle {
+    constructor(){
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2 + 1;
+      this.speedX = Math.random() * 0.5 - 0.25;
+      this.speedY = Math.random() * 0.5 - 0.25;
+      this.color = `rgba(0,0,0,${Math.random()*0.6 + 0.2})`; // black with subtle opacity
+    }
+    update(){
+      this.x += this.speedX;
+      this.y += this.speedY;
+      if(this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+      if(this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+    }
+    draw(){
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function initParticles(){
+    particlesArray = [];
+    for(let i = 0; i < 80; i++){
+      particlesArray.push(new Particle());
+    }
+  }
+
+  function animateParticles(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particlesArray.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    requestAnimationFrame(animateParticles);
+  }
+
+  window.addEventListener('resize', function(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initParticles();
+  });
+
+  initParticles();
+  animateParticles();
+
+</script>
+
+{% endblock %}
